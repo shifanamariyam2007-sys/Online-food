@@ -1,0 +1,80 @@
+HTML (index.html)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodieHub - Online Food Ordering</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="navbar">
+    <h1>🍴 FoodieHub</h1>
+    <nav>
+      <a href="#menu">Menu</a>
+      <a href="#cart">Cart (<span id="cartCount">0</span>)</a>
+      <a href="#checkout">Checkout</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Hungry? Order your favourite food online</h2>
+    <p>Fresh, tasty and delivered fast to your doorstep.</p>
+    <input type="text" id="searchBox" placeholder="Search for biryani, pizza, dosa...">
+  </section>
+
+  <main>
+    <section id="menu">
+      <h2>Our Menu</h2>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-cat="All">All</button>
+        <button class="filter-btn" data-cat="Main Course">Main Course</button>
+        <button class="filter-btn" data-cat="Fast Food">Fast Food</button>
+        <button class="filter-btn" data-cat="Tiffin">Tiffin</button>
+        <button class="filter-btn" data-cat="Desserts">Desserts</button>
+        <button class="filter-btn" data-cat="Drinks">Drinks</button>
+      </div>
+      <div class="grid" id="foodGrid"></div>
+    </section>
+
+    <section id="cart">
+      <h2>Your Cart</h2>
+      <div id="cartItems"></div>
+      <div class="total">Total: <span id="cartTotal">₹0</span></div>
+    </section>
+
+    <section id="checkout">
+      <h2>Checkout</h2>
+      <form id="orderForm" novalidate>
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Enter your name">
+        <small class="error" id="nameErr"></small>
+        <label>Phone Number</label>
+        <input type="text" id="phone" placeholder="10 digit mobile number">
+        <small class="error" id="phoneErr"></small>
+        <label>Delivery Address</label>
+        <textarea id="address" rows="3" placeholder="Enter delivery address"></textarea>
+        <small class="error" id="addrErr"></small>
+        <label>Payment Method</label>
+        <select id="payment">
+          <option>Cash on Delivery</option>
+          <option>UPI</option>
+          <option>Credit / Debit Card</option>
+        </select>
+        <button type="submit" class="primary">Place Order</button>
+      </form>
+    </section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <h2>✅ Order Placed Successfully!</h2>
+      <p id="orderMsg"></p>
+      <button class="primary" id="closeModal">OK</button>
+    </div>
+  </div>
+
+  <footer>© 2026 FoodieHub | Fundamentals of Web Development</footer>
+  <script src="script.js"></script>
+</body>
+</html>
