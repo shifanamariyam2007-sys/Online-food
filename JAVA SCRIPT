@@ -1,0 +1,109 @@
+// ---------- Menu data ----------
+const foods = [
+  { id: 1, name: "Chicken Biryani", cat: "Main Course", price: 180, emoji: "🍛" },
+  { id: 2, name: "Veg Meals", cat: "Main Course", price: 120, emoji: "🍱" },
+  { id: 3, name: "Cheese Pizza", cat: "Fast Food", price: 250, emoji: "🍕" },
+  { id: 4, name: "Veg Burger", cat: "Fast Food", price: 99, emoji: "🍔" },
+  { id: 5, name: "French Fries", cat: "Fast Food", price: 70, emoji: "🍟" },
+  { id: 6, name: "Masala Dosa", cat: "Tiffin", price: 60, emoji: "🥞" },
+  { id: 7, name: "Idli Sambar", cat: "Tiffin", price: 40, emoji: "🍚" },
+  { id: 8, name: "Gulab Jamun", cat: "Desserts", price: 50, emoji: "🍮" },
+  { id: 9, name: "Ice Cream", cat: "Desserts", price: 80, emoji: "🍨" },
+  { id: 10, name: "Cold Coffee", cat: "Drinks", price: 90, emoji: "🥤" },
+  { id: 11, name: "Fresh Lime Soda", cat: "Drinks", price: 45, emoji: "🍹" },
+  { id: 12, name: "Parotta & Kurma", cat: "Main Course", price: 110, emoji: "🫓" }
+];
+
+let cart = [];
+let activeCat = "All";
+
+const grid = document.getElementById("foodGrid");
+const searchBox = document.getElementById("searchBox");
+
+// ---------- Display menu with search + category filter ----------
+function renderMenu() {
+  const text = searchBox.value.trim().toLowerCase();
+  const list = foods.filter(f =>
+    (activeCat === "All" || f.cat === activeCat) &&
+    f.name.toLowerCase().includes(text));
+  grid.innerHTML = list.length ? "" : "<p class='empty'>No food items found.</p>";
+  list.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<div class="emoji">${f.emoji}</div>
+      <h3>${f.name}</h3><div class="cat">${f.cat}</div>
+      <div class="price">₹${f.price}</div>
+      <button onclick="addToCart(${f.id})">Add to Cart</button>`;
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById("filters").addEventListener("click", e => {
+  if (!e.target.classList.contains("filter-btn")) return;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
+  activeCat = e.target.dataset.cat;
+  renderMenu();
+});
+searchBox.addEventListener("input", renderMenu);
+
+// ---------- Cart logic ----------
+function addToCart(id) {
+  const item = cart.find(c => c.id === id);
+  if (item) item.qty++;
+  else cart.push({ ...foods.find(f => f.id === id), qty: 1 });
+  renderCart();
+}
+function changeQty(id, d) {
+  const item = cart.find(c => c.id === id);
+  item.qty += d;
+  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  renderCart();
+}
+function removeItem(id) { cart = cart.filter(c => c.id !== id); renderCart(); }
+
+function renderCart() {
+  const box = document.getElementById("cartItems");
+  box.innerHTML = cart.length ? "" : "<p class='empty'>Your cart is empty. Add some food!</p>";
+  let total = 0, count = 0;
+  cart.forEach(c => {
+    total += c.price * c.qty; count += c.qty;
+    box.innerHTML += `<div class="cart-row">
+      <span>${c.emoji} ${c.name} - ₹${c.price}</span>
+      <span class="qty"><button onclick="changeQty(${c.id},-1)">-</button><span>${c.qty}</span>
+      <button onclick="changeQty(${c.id},1)">+</button>
+      <button class="remove" onclick="removeItem(${c.id})">🗑</button></span>
+      <strong>₹${c.price * c.qty}</strong></div>`;
+  });
+  document.getElementById("cartTotal").textContent = "₹" + total;
+  document.getElementById("cartCount").textContent = count;
+}
+
+// ---------- Form validation + order placement ----------
+function setError(inputId, errId, msg) {
+  document.getElementById(errId).textContent = msg;
+  document.getElementById(inputId).classList.toggle("invalid", !!msg);
+  return !msg;
+}
+document.getElementById("orderForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const addr = document.getElementById("address").value.trim();
+  const v1 = setError("name", "nameErr", name.length < 3 ? "Enter a valid name (min 3 letters)" : "");
+  const v2 = setError("phone", "phoneErr", /^[6-9]\d{9}$/.test(phone) ? "" : "Enter a valid 10 digit mobile number");
+  const v3 = setError("address", "addrErr", addr.length < 10 ? "Enter complete delivery address" : "");
+  if (!(v1 && v2 && v3)) return;
+  if (cart.length === 0) { alert("Please add at least one item to the cart."); return; }
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const orderId = "FH" + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById("orderMsg").innerHTML =
+    `Thank you, <b>${name}</b>!<br>Order ID: <b>${orderId}</b><br>Amount: <b>₹${total}</b> (${document.getElementById("payment").value})<br>Estimated delivery: 30-40 minutes.`;
+  document.getElementById("modal").classList.add("show");
+  cart = []; renderCart(); e.target.reset();
+});
+document.getElementById("closeModal").onclick = () =>
+  document.getElementById("modal").classList.remove("show");
+
+renderMenu();
+renderCart();
